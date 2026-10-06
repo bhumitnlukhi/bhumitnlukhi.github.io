@@ -3,61 +3,110 @@
 <head>
   <base href="/">
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Bhumit Lukhi - Flutter Developer.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bhumit Lukhi — Application Developer with 4+ years building Flutter & Android apps: JoinMuse (USA), Dasher robotic delivery (UAE), Spice Money Cash Deposit (India), Medigo and EasyMeds.">
+  <meta name="theme-color" content="#05060F">
+  <meta property="og:title" content="Bhumit Lukhi — Application Developer">
+  <meta property="og:description" content="4+ years shipping production Flutter & Android apps across the USA, UAE and India.">
+  <meta property="og:type" content="website">
 
-  <title>Bhumit Lukhi</title>
+  <title>Bhumit Lukhi — Application Developer</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+  <!-- Flutter downloads its renderer (CanvasKit / skwasm) and fallback fonts from these hosts. -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Start downloading fonts + hero photo while the engine boots. -->
+  <link rel="preload" href="assets/assets/fonts/web/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/assets/fonts/web/Poppins-Medium.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/assets/fonts/web/Poppins-SemiBold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/assets/fonts/web/Poppins-Bold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/assets/imgs/profile.jpg" as="fetch" crossorigin>
 
   <style>
-    #loader-wrapper {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #11101D;
-      display: flex; justify-content: center; align-items: center;
-      flex-direction: column;
-      z-index: 9999;
+    html, body { margin: 0; height: 100%; background: #05060F; }
+
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      background: radial-gradient(circle at 30% 30%, rgba(254, 83, 187, .14), transparent 45%),
+                  radial-gradient(circle at 70% 70%, rgba(9, 251, 211, .12), transparent 45%),
+                  #05060F;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      transition: opacity .6s ease, transform .6s ease;
     }
-    .spinner {
-      width: 50px; height: 50px;
-      border: 6px solid #09FBD3; border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+    #loader.done { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+    /* Phone mockup with app tiles "installing" one after another */
+    .phone {
+      position: relative; width: 92px; height: 176px; border-radius: 20px;
+      border: 3px solid rgba(255, 255, 255, .85);
+      box-shadow: 0 0 40px rgba(9, 251, 211, .25), inset 0 0 18px rgba(254, 83, 187, .15);
+      animation: float 2.4s ease-in-out infinite;
     }
-    .loader-text {
-      margin-top: 12px;
-      color: #fff8;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      letter-spacing: 1px;
+    .phone::before {
+      content: ""; position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+      width: 26px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .6);
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .grid {
+      position: absolute; inset: 24px 12px 18px; display: grid;
+      grid-template-columns: repeat(3, 1fr); gap: 7px; align-content: start;
+    }
+    .grid span {
+      aspect-ratio: 1; border-radius: 6px;
+      background: linear-gradient(135deg, #aa367c, #4a2fbd);
+      opacity: 0; transform: scale(.3);
+      animation: pop 2.4s cubic-bezier(.34, 1.56, .64, 1) infinite;
+    }
+    .grid span:nth-child(3n+2) { background: linear-gradient(135deg, #09FBD3, #33BBCF); }
+    .grid span:nth-child(4n)   { background: linear-gradient(135deg, #FE53BB, #aa367c); }
+    .grid span:nth-child(1) { animation-delay: .00s } .grid span:nth-child(2) { animation-delay: .12s }
+    .grid span:nth-child(3) { animation-delay: .24s } .grid span:nth-child(4) { animation-delay: .36s }
+    .grid span:nth-child(5) { animation-delay: .48s } .grid span:nth-child(6) { animation-delay: .60s }
+    .grid span:nth-child(7) { animation-delay: .72s } .grid span:nth-child(8) { animation-delay: .84s }
+    .grid span:nth-child(9) { animation-delay: .96s }
+
+    .brand { color: #fff; font-size: 20px; font-weight: 300; letter-spacing: .5px; }
+    .brand b { font-weight: 600; background: linear-gradient(90deg, #09FBD3, #FE53BB);
+               -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .brand .caret { display: inline-block; width: 2px; height: 1em; margin-left: 3px; vertical-align: -2px;
+                    background: #09FBD3; animation: blink 1s steps(1) infinite; }
+
+    .bar { width: 160px; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(255, 255, 255, .12); }
+    .bar::after {
+      content: ""; display: block; width: 40%; height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, #09FBD3, #FE53BB);
+      animation: load 1.2s ease-in-out infinite;
+    }
+    .hint { color: rgba(255, 255, 255, .5); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+
+    @keyframes pop {
+      0% { opacity: 0; transform: scale(.3) }
+      15%, 80% { opacity: 1; transform: scale(1) }
+      100% { opacity: 0; transform: scale(.6) }
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+    @keyframes blink { 50% { opacity: 0 } }
+    @keyframes load { 0% { transform: translateX(-100%) } 100% { transform: translateX(250%) } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .phone, .grid span, .caret, .bar::after { animation: none; }
+      .grid span { opacity: 1; transform: none; }
+    }
   </style>
 </head>
 <body>
-<!-- Loader -->
-<div id="loader-wrapper">
-  <div class="spinner"></div>
-  <div class="loader-text">Bhumit's ideas are compiling...⚙️</div>
-</div>
+  <div id="loader" role="progressbar" aria-label="Loading portfolio">
+    <div class="phone"><div class="grid">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div></div>
+    <div class="brand">&lt; <b>Bhumit Lukhi</b> /&gt;<span class="caret"></span></div>
+    <div class="bar"></div>
+    <div class="hint">Compiling portfolio</div>
+  </div>
 
-<!-- Flutter Engine + Initialization -->
-<script src="flutter.js" defer></script>
-<script>
-  window.addEventListener('load', function() {
-    _flutter.loader.loadEntrypoint({ serviceWorker: { serviceWorkerVersion: '"343316526"' } })
-      .then((engineInitializer) => engineInitializer.initializeEngine({ renderer: 'html' }))
-      .then((appRunner) => appRunner.runApp())
-      .then(() => {
-        const loader = document.getElementById('loader-wrapper');
-        loader.style.transition = 'opacity 0.4s ease-out';
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 400);
-      });
-  });
-</script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
