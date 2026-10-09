@@ -1,11 +1,11 @@
 {
-    "name": "mysite",
-    "short_name": "mysite",
+    "name": "Bhumit Lukhi — Application Developer",
+    "short_name": "Bhumit Lukhi",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#05060F",
+    "theme_color": "#05060F",
+    "description": "Application Developer with 4+ years building production Flutter & Android apps across the USA, UAE and India.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

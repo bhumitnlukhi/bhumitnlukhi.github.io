@@ -33,23 +33,50 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"3452d735bd38224ef2db85ca763d862d6326b17f","builds":[{"compileTarget":"dart2wasm","renderer":"skwasm","mainWasmPath":"main.dart.wasm","jsSupportRuntimePath":"main.dart.mjs"},{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}]};
+_flutter.buildConfig = {"engineRevision":"3452d735bd38224ef2db85ca763d862d6326b17f","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"}]};
 
 
-// Modern Flutter web initialization (replaces the deprecated
-// `_flutter.loader.loadEntrypoint`). The renderer is chosen by the build:
-// `flutter build web --wasm` uses skwasm where supported, CanvasKit otherwise.
-_flutter.loader.load({
-  onEntrypointLoaded: async function (engineInitializer) {
-    const appRunner = await engineInitializer.initializeEngine();
-    await appRunner.runApp();
+// Engine start-up.
+//
+// Two things used to go wrong here. The splash was dismissed one
+// `requestAnimationFrame` after `runApp()` resolved — but `runApp()` resolves
+// when the app is *scheduled*, not drawn, so on a phone it could disappear
+// well before the first pixel. And if any step threw (a blocked CanvasKit CDN,
+// a wasm compile the browser refused, an out-of-memory tab) the rejection went
+// nowhere and the splash animated forever, which is exactly what "it hangs on
+// mobile" looks like.
+//
+// Now: progress is reported at each real milestone, Dart dismisses the splash
+// from its first post-frame callback, and every failure path is surfaced.
+(function () {
+  var stage = window.__flutterStage || function () {};
+  var failed = function (e) {
+    if (window.__flutterBootFailed) window.__flutterBootFailed(e);
+    else console.error(e);
+  };
 
-    // Wait one frame so Flutter has painted before the splash fades away.
-    requestAnimationFrame(function () {
-      const loader = document.getElementById('loader');
-      if (!loader) return;
-      loader.classList.add('done');
-      setTimeout(function () { loader.remove(); }, 650);
-    });
-  },
-});
+  stage(0.15, 'Starting engine');
+
+  try {
+    _flutter.loader.load({
+      onEntrypointLoaded: async function (engineInitializer) {
+        try {
+          stage(0.55, 'Initialising');
+          const appRunner = await engineInitializer.initializeEngine();
+          stage(0.8, 'Rendering');
+          await appRunner.runApp();
+          // From here the splash waits for window.__flutterAppReady(), which
+          // Dart calls once a frame has actually been painted.
+        } catch (e) {
+          failed(e);
+        }
+      },
+    }).catch(failed);
+  } catch (e) {
+    failed(e);
+  }
+
+  window.addEventListener('unhandledrejection', function (e) {
+    failed(e.reason);
+  });
+})();
